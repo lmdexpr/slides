@@ -1,0 +1,188 @@
+@require: math
+@require: pervasives
+@require: figbox/figbox
+@require: base/color-ext
+@require: class-slydifi/theme/arctic
+
+open FigBox
+open SlydifiOverlay
+
+let-inline ctx \cjk it =
+  let ctx = ctx |> set-dominant-narrow-script Kana in
+  read-inline ctx it
+
+let-block ctx +flush-right it =
+  line-break true true ctx (inline-fil ++ read-inline ctx it)
+
+in
+
+document '<
+
+  +make-title(|
+    title  = {|形式的べき級数を理解する|とまではいかないまでも|なんとなく知る|};
+    author = {|lmdexpr|GitHub: \link(`https://github.com/lmdexpr`);|};
+    date   = {|2023年5月24日|};
+  |);
+
+  +section{|形式的べき級数とは|}<
+
+    +frame?:(2){定義}<
+      +p{${A : ring}}
+      +p{
+        ${A} に係数をもち ${X} を変数とする\emph?:(only 1){形式的べき級数}とは
+      }
+
+      +math(${
+        \sum_{n=0}^\infty a_n X^n = a_0 + a_1 X + a_2 X^2 + a_3 X^3 + \cdots + a_n X^n + \cdots
+      });
+      +flush-right{(ここで ${a_n \in A})}
+
+      +p{の\emph?:(only 2){形式をもつもの}のことである}
+    >
+
+    +frame?:(4){「形式的」とは}<
+      
+      +p{べき級数というと、その名の通り変数がべき乗になっている級数のこと}
+
+      +ghost(from 2)<
+        +p{ここで\emph?:(only 2){無限は値ではない}ので何らかの意味付けをしなくてはならない}
+      >
+
+      +ghost(from 3)<
+        +p{その１つは\emph?:(only 3){解析的な意味付け}で収束や発散はこちらの言葉}
+      >
+
+      +ghost(from 4)<
+        +p{今回考えるのは\emph?:(only 4){代数的な意味付け}で\emph?:(only 4){形式的な和}として捉えるという意味がある}
+      >
+
+    >
+
+  >
+
+  +section{|何の役に立つのか？|}<
+    
+    +frame?:(3){問題}<
+      +fig-center(
+        vconcat ?:0.5 [
+          textbox {りんごを2個、みかんを3個、ぶどうが4個売られています。};
+          gap 3pt;
+          textbox {合計n個買う方法は何通りあるでしょうか？}
+        ] |> hvmargin 15pt |> frame 1pt (Color.gray 0.7)
+      );
+
+      +p{出典: \link(`https://maspypy.com/多項式・形式的べき級数数え上げとの対応付け`);}
+
+      +ghost(from 2)<
+        +p{なんと、この問題は\emph?:(only 2){多項式として計算}ができます}
+      >
+
+      +ghost(from 3)<
+        +p{解答}
+
+        +math(${
+          \[x^n\](1 + x + x^2)(1 + x + x^2 + x^3)(1 + x + x^2 + x^3 + x^4)
+        });
+      >
+    >
+
+    +frame?:(3){問題}<
+      +fig-center(
+        vconcat ?:0.5 [
+          textbox {りんご、みかん、ぶどうが無限個売られています。};
+          gap 3pt;
+          textbox {合計n個買う方法は何通りあるでしょうか？}
+        ] |> hvmargin 15pt |> frame 1pt (Color.gray 0.7)
+      );
+
+      +p{出典: \link(`https://maspypy.com/多項式・形式的べき級数数え上げとの対応付け`);}
+
+      +ghost(from 2)<
+        +p{\emph?:(only 2){形式的べき級数}が使えそう！}
+      >
+
+      +ghost(from 3)<
+        +p{解答}
+
+        +math(${
+          \[x^n\](\sum_{n=0}^\infty x^n)^3
+        });
+      >
+    >
+
+    +frame{(think)}<
+      +p{あれ？}
+      +p{かけ算ってどうするんだろう？}
+    >
+  >
+
+  +section{|形式的べき級数環|}<
+    +frame{定義}<
+      +p{
+        ${A\[\[X\]\]} を形式的べき級数全体の集合とするとき ${A\[\[X\]\]} の上の演算として、
+      }
+
+      +math(${
+        \sum_{n=0}^\infty a_n X^n + \sum_{n=0}^\infty b_n X^n = \sum_{n=0}^\infty (a_n + b_n) X^n
+      });
+      +math(${
+        \(\sum_{n=0}^\infty a_n X^n\)\(\sum_{n=0}^\infty b_n X^n\) = \sum_{n=0}^\infty (\sum_{i+j=n} a_i + b_j) X^n
+      });
+
+      +p{と定めることで、${A\[\[X\]\]} は環になり、これを\emph{形式的べき級数環}という}
+    >
+
+    +frame{(think)}<
+      +p{応用はなんとなく分かったけど、結局何が嬉しかったんだろう？}
+      +p{定義を見ても特別計算が速くなったりしなさそうだな}
+    >
+  >
+
+  +section{|高速フーリエ変換(FFT)|}<
+    +frame?:(4){って何？ (\show-layer;/4)}<
+      +itemize?:(EnumitemAlias.listing-default-label)<
+        +item{高速フーリエ変換 (Fast Fourier Transform, FFT) とは、}<
+          +item{
+            離散フーリエ変換 (Discrete Fourier Transform, DFT) を
+            \emph?:(only 1){高速に計算する}アルゴリズムのこと
+          }<>
+        >
+        +oitem(between 2 4){離散フーリエ変換とは、}<
+          +oitem(between 2 4){\emph?:(only 2){離散データに対する}フーリエ変換 (Fourier Transform, FT) のこと}<>
+        >
+        +oitem(between 3 4){フーリエ変換とは、}<
+          +oitem(between 3 4){ある関数をまた別の関数に写すような変換のこと}<>
+        >
+        +oitem(only 4){
+          ここで重要なのは\emph{級数が関わっている}ということ
+        }<>
+      >
+    >
+
+    +frame?:(3){高速ってことは早いんでしょ？}<
+      +ghost(from 1)<
+        +p{\emph?:(only 1){その通り}}
+      >
+      +ghost(from 2)<
+        +p{計算量としては \emph?:(only 2){${\Omicron(N^2)} が ${\Omicron(N \log N)} になる}くらい違う}
+      >
+      +ghost(from 3)<
+        +p{雑に言うと、共通部分をうまく見つけてダブリングっぽいことをしながら高速化します}
+      >
+    >
+  >
+
+  +section{|最後に|}<
+    +frame{まとめ}<
+      +listing{
+        * 形式的べき級数は数え上げの問題に使える
+          ** 例には出してないものの、ナップザック問題なども解ける
+          ** 用語を出しておくと「動的計画法」と呼ばれる手法を式で表してるだけ
+        * 形式的べき級数は FFT によって高速に計算ができる
+        * この組み合わせによって、ある種の問題を高速に解ける！
+        * 個人的にはこういう考え方・見方を変えるという事象を多く知ることは重要だと思う
+      }
+    >
+  >
+
+>

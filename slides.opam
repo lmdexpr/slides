@@ -11,6 +11,8 @@ depends: [
   "dune" {>= "3.7"}
   "satysfi"
   "satysfi-dist"
+  "satysfi-class-slydifi"
+  "satysfi-figbox"
   "satyrographos"
   "odoc" {with-doc}
 ]
