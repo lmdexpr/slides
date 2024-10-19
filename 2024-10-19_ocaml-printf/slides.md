@@ -31,7 +31,7 @@ transition: fade-out
 
 # 自己紹介
 
-yuki @lmdexpr
+Yuki Tajiri @lmdexpr
 
 <div class="text-4xl">
 
@@ -279,8 +279,6 @@ layout: center
 <div class="text-7xl">
 🤔
 </div>
-<br>
-<div v-click>静的型付けなはずでは？</div>
 
 ---
 layout: default
@@ -386,8 +384,6 @@ layout: center
 <div class="text-7xl">
 🤔
 </div>
-<br>
-<div v-click>どうやってるんだ？</div>
 
 ---
 layout: center
